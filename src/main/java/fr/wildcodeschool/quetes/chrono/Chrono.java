@@ -1,6 +1,7 @@
 package fr.wildcodeschool.quetes.chrono;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -35,10 +36,12 @@ public class Chrono {
   private JPanel buttonsPanel;
   private JPanel centerPanel;
   private JPanel currentTimePanel;
+  private Boolean maximise;
 
 
-  public Chrono(TimeProvider timeProvider) {
+  public Chrono(TimeProvider timeProvider, Boolean maximise) {
     this.timeProvider = timeProvider;
+    this.maximise = maximise;
 
     startStopButton.addActionListener(new ActionListener() {
       @Override
@@ -92,6 +95,8 @@ public class Chrono {
       }
     };
 
+    if(maximise)
+      frame.setExtendedState(Frame.MAXIMIZED_BOTH);
     frame.setContentPane(mainPanel);
     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     frame.pack();
@@ -108,7 +113,10 @@ public class Chrono {
       refreshCounters(); // in case we're not initialized at 0 seconds
 
       while (rolling) {
-        refreshCounters();
+        if(timeProvider.isStarted()) {
+          refreshCounters();
+        }
+
         refreshCurrentDateTime();
 
         frame.repaint();
@@ -134,3 +142,4 @@ public class Chrono {
 
 
 }
+
