@@ -1,23 +1,24 @@
 package fr.wildcodeschool.quetes.chrono;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 public class DummyTimeProvider implements TimeProvider {
 
     private Long totalTime;
-    private LocalDateTime startTime = LocalDateTime.now();
+    private Date date = new Date();
+    private Long time = date.getTime() / 1000;
     private Boolean start = false;
-    private boolean reset = false;
     private Long delay = 0L;
+    private boolean reset = false;
+    private Long startTime = 0L;
 
     @Override
     public void startStop() {
         if (!start) {
             start = true;
             if (reset) {
-                startTime = LocalDateTime.now();
+                date = new Date();
+                time = date.getTime() / 1000;
                 reset = false;
             }
         } else {
@@ -27,34 +28,37 @@ public class DummyTimeProvider implements TimeProvider {
 
     @Override
     public void reset() {
-        this.delay = 0L;
-        this.totalTime = 0L;
         if (start) {
-            this.startTime = LocalDateTime.now();
+            this.date = new Date();
+            this.time = date.getTime() / 1000;
+            this.delay = 0L;
             this.reset = false;
         }
         else {
+            this.totalTime = 0L;
+            delay = 0L;
             this.reset = true;
         }
     }
 
     public DummyTimeProvider(Long elapsed) {
-        this.delay = elapsed;
+        this.startTime = elapsed;
         this.totalTime = elapsed;
     }
 
     @Override
     public boolean isStarted() {
         if (start) {
-            Duration gap = Duration.between(startTime,LocalDateTime.now().plusSeconds(delay));
-            this.totalTime = gap.toSeconds();
+            Date dateFin = new Date();
+            Long timeFin = (dateFin.getTime() / 1000) + startTime; //ici startTime qui contient le nb de secondes entrés en argument
+            this.totalTime = timeFin - this.time - delay;
             return true;
         }
         else {
             if (reset) {
                 return true;
             } else {
-                startTime = startTime.plusSeconds(1);
+                delay += 1;
                 return false;
             }
         }
